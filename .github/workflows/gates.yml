@@ -1,0 +1,51 @@
+# Deterministic gate checks. pull_request_target runs THIS definition from the base branch,
+# so a pull request cannot weaken the checks by editing this file. PR content is only read
+# (hashed and diffed), never executed.
+name: gates
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+  issues: read
+jobs:
+  source-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Requirements source must be unchanged and match the base-branch fingerprint
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          changed=$(git diff --name-only "$BASE_SHA"...HEAD -- requirements/source/ || true)
+          if [ -n "$changed" ]; then
+            echo "::error::Approved requirements source changed in this PR: $changed"; exit 1
+          fi
+          expected=$(git show "$BASE_SHA":requirements/source/SOURCE_FINGERPRINT.md | grep -oE '[0-9a-f]{64}' | head -1)
+          actual=$(sha256sum requirements/source/ToolShare_Commons_SRS_v1.0.docx | cut -d' ' -f1)
+          echo "expected=$expected actual=$actual"
+          [ "$expected" = "$actual" ] || { echo "::error::Source fingerprint mismatch"; exit 1; }
+          if git ls-files | grep -i -E 'answer_key|sealed' ; then
+            echo "::error::Sealed material must never be committed"; exit 1
+          fi
+  requirements-block-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: No open disposition:BLOCK issue may exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          n=$(gh issue list --repo "$REPO" --state open --label "disposition:BLOCK" --json number --jq 'length')
+          echo "open BLOCK issues: $n"
+          if [ "$n" -ne 0 ]; then
+            gh issue list --repo "$REPO" --state open --label "disposition:BLOCK"
+            echo "::error::Unresolved BLOCK findings prevent advancement"; exit 1
+          fi

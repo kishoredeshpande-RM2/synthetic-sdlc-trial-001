@@ -1,0 +1,10 @@
+# Used in the identity/approval experiment: Dependabot is a GitHub-native bot that can open a
+# harmless pull request (a GitHub Actions version bump) authored by an identity other than the
+# Product Owner. No auto-merge is configured.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 1

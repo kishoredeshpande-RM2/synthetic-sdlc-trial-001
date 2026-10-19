@@ -1,0 +1,63 @@
+# Creates the required check "independent-verification" ONLY for a Verifier verdict that is
+# (1) signed with an enrolled Verifier SSH key listed in .github/verifier/allowed_signers on the
+# default branch, (2) bound to this repository, this pull request and its CURRENT head SHA, and
+# (3) a PASS. Anything else creates nothing, so the required check stays missing and merging is
+# blocked (fail closed). issue_comment workflows always run the default-branch definition.
+name: independent-verification
+on:
+  issue_comment:
+    types: [created]
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+jobs:
+  verify-signed-verdict:
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, 'SDLC-VERIFIER-VERDICT v1')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.0
+        with:
+          persist-credentials: false
+      - name: Verify signature and binding, then create the check run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, re, subprocess, sys
+          ev = json.load(open(os.environ["GITHUB_EVENT_PATH"]))
+          body = ev["comment"]["body"].replace("\r\n", "\n")
+          pr = ev["issue"]["number"]
+          m = re.match(r"(SDLC-VERIFIER-VERDICT v1\n(?:[a-z_0-9]+: [^\n]*\n)+)(-----BEGIN SSH SIGNATURE-----\n[A-Za-z0-9+/=\n]+-----END SSH SIGNATURE-----)\s*$", body)
+          if not m:
+              sys.exit("REJECT: malformed verdict")
+          payload, sig = m.group(1), m.group(2) + "\n"
+          fields = dict(l.split(": ", 1) for l in payload.splitlines()[1:])
+          if not os.path.exists(".github/verifier/allowed_signers"):
+              sys.exit("REJECT: no enrolled Verifier key on the default branch")
+          open("/tmp/payload", "w").write(payload); open("/tmp/sig", "w").write(sig)
+          r = subprocess.run(["ssh-keygen", "-Y", "verify", "-f", ".github/verifier/allowed_signers",
+                              "-I", "verifier@synthetic-trial", "-n", "sdlc-verifier-verdict", "-s", "/tmp/sig"],
+                             stdin=open("/tmp/payload"), capture_output=True, text=True)
+          print(r.stdout, r.stderr)
+          if r.returncode != 0:
+              sys.exit("REJECT: signature not valid for the enrolled Verifier key")
+          head = subprocess.run(["gh", "api", f"repos/{os.environ['REPO']}/pulls/{pr}", "--jq", ".head.sha"],
+                                capture_output=True, text=True, check=True).stdout.strip()
+          problems = []
+          if fields.get("repository") != os.environ["REPO"]: problems.append("repository mismatch")
+          if fields.get("pull_request") != str(pr): problems.append("pull request mismatch")
+          if fields.get("head_sha") != head: problems.append(f"stale or wrong SHA (verdict {fields.get('head_sha')}, current head {head})")
+          if fields.get("verdict") != "PASS": problems.append(f"verdict is {fields.get('verdict')}")
+          if problems:
+              sys.exit("REJECT: " + "; ".join(problems))
+          summary = "Signed Verifier verdict accepted.\n\n```\n" + payload + "```"
+          subprocess.run(["gh", "api", f"repos/{os.environ['REPO']}/check-runs",
+                          "-f", "name=independent-verification", "-f", f"head_sha={head}",
+                          "-f", "status=completed", "-f", "conclusion=success",
+                          "-f", "output[title]=Independent verification PASS (signed)",
+                          "-f", f"output[summary]={summary}"], check=True)
+          print("ACCEPTED: check run created for", head)
+          PY
