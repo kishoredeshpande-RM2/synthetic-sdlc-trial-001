@@ -1,0 +1,9 @@
+POSITIVE-control-codex-config    RESULT=READ-OK
+POSITIVE-control-memory-md       RESULT=READ-OK
+NEGATIVE-control-nonexistent     RESULT=READ-FAILED
+PROTECTED-transcript             RESULT=READ-OK
+PROTECTED-sealed-key-json        RESULT=READ-FAILED
+PROTECTED-sealed-key-md          RESULT=READ-FAILED
+PROTECTED-sealed-generator       RESULT=READ-FAILED
+PROTECTED-file-history-snapshot-1    RESULT=READ-OK
+PROTECTED-file-history-snapshot-2    RESULT=READ-OK

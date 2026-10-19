@@ -1,0 +1,3 @@
+{"name":"protect-source-and-workflow-paths","target":"push","enforcement":"active",
+ "bypass_actors":[],
+ "rules":[{"type":"file_path_restriction","parameters":{"restricted_file_paths":["requirements/source/**",".github/**"]}}]}

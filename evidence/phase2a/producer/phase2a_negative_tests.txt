@@ -1,0 +1,77 @@
+### N1 direct push to main (Producer, PO credentials)
+remote: error: GH013: Repository rule violations found for refs/heads/main.        
+remote: - Changes must be made through a pull request.        
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'ssh://github.com/kishoredeshpande-RM2/synthetic-sdlc-trial-001.git'
+remote main now: b8ee8b2d057f
+### N2 force push (non-fast-forward) to main
+remote: error: GH013: Repository rule violations found for refs/heads/main.        
+remote: - Cannot force-push to this branch        
+ ! [remote rejected] tmp-diverge -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'ssh://github.com/kishoredeshpande-RM2/synthetic-sdlc-trial-001.git'
+remote main now: b8ee8b2d057f
+### N5 Producer self-approval of its own PR #13 (PO credentials)
+failed to create review: GraphQL: Review Can not approve your own pull request (addPullRequestReview)
+### N4 merge PR #13 without approval/verification
+X Pull request kishoredeshpande-RM2/synthetic-sdlc-trial-001#13 is not mergeable: the base branch policy prohibits the merge.
+To have the pull request merged after all the requirements have been met, add the `--auto` flag.
+To use administrator privileges to immediately merge the pull request, add the `--admin` flag.
+### N4b administrator override merge of #13 (--admin)
+Required status check "independent-verification" is expected.
+
+ (mergePullRequest)
+PR #13 state: OPEN BLOCKED REVIEW_REQUIRED
+### N8 open disposition:BLOCK issue -> requirements-block-gate must fail on re-run
+test issue #15
+requirements-block-gate=failure
+source-integrity=success
+after closing BLOCK issue:
+requirements-block-gate=success
+source-integrity=success
+### N9 baseline tag: create, then attempt move and delete
+remote: error: GH013: Repository rule violations found for refs/tags/baseline/TEST-phase2a-do-not-use.        
+remote: - Cannot update this protected ref.        
+ ! [remote rejected] baseline/TEST-phase2a-do-not-use -> baseline/TEST-phase2a-do-not-use (push declined due to repository rule violations)
+remote: error: GH013: Repository rule violations found for refs/tags/baseline/TEST-phase2a-do-not-use.        
+remote: - Cannot delete this tag        
+ ! [remote rejected] baseline/TEST-phase2a-do-not-use (push declined due to repository rule violations)
+remote tag now -> b831ac423a24
+T3 = PR #16
+T7 = PR #17
+### PR #16 head 83370b828a0b7c58d0d252a8a91967c4a5a38f1f check runs (name conclusion app created_at title)
+requirements-block-gate success github-actions#15368 2026-10-19T20:21:03Z []
+source-integrity failure github-actions#15368 2026-10-19T20:21:04Z []
+mergeState: BLOCKED REVIEW_REQUIRED
+### PR #17 head b9820f2c4215913ed6568cc74221d9413c084088 check runs (name conclusion app created_at title)
+source-integrity failure github-actions#15368 2026-10-19T20:21:06Z []
+forge success github-actions#15368 2026-10-19T20:21:06Z []
+independent-verification success github-actions#15368 2026-10-19T20:21:07Z [FORGED by negative test N7]
+requirements-block-gate success github-actions#15368 2026-10-19T20:21:07Z []
+source-integrity success github-actions#15368 2026-10-19T20:21:08Z [FORGED by negative test N7]
+mergeState: BLOCKED REVIEW_REQUIRED
+### N7 merge attempts on #17 (normal, then --admin)
+X Pull request kishoredeshpande-RM2/synthetic-sdlc-trial-001#17 is not mergeable: the base branch policy prohibits the merge.
+To have the pull request merged after all the requirements have been met, add the `--auto` flag.
+GraphQL: Repository rule violations found
+
+New changes require approval from someone other than the last pusher.
+PR #17 state: OPEN
+### N6a malformed/unsigned PASS verdict comment on #13
+### N6b PASS verdict signed with a Producer-generated key (not enrolled)
+39318687375 issue_comment failure
+39318685027 issue_comment failure
+39318476215 issue_comment skipped
+REJECT: malformed verdict")[0m
+REJECT: malformed verdict")[0m
+independent-verification check runs on #13 head: 0
+run 39318685027:
+REJECT: malformed verdict
+##[error]Process completed with exit code 1.
+run 39318687375:
+REJECT: no enrolled Verifier key on the default branch
+##[error]Process completed with exit code 1.
+### N6 offline signature-core test (Producer evidence only; ssh-keygen: OpenSSH_10.0p2, OpenSSL 3.5.3 16 Sep 2025)
+valid verifier signature                     expected=ACCEPT actual=ACCEPT
+producer-key signature                       expected=REJECT actual=REJECT
+verifier key, wrong namespace                expected=REJECT actual=REJECT
+tampered payload (PASS->FAIL)                expected=REJECT actual=REJECT
