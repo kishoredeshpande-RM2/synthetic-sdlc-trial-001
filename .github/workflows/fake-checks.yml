@@ -1,0 +1,20 @@
+# NEGATIVE TEST N7 ONLY: attempts to forge required checks from inside a pull request.
+name: fake-checks
+on: pull_request
+permissions:
+  checks: write
+  contents: read
+jobs:
+  forge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Forge required check runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          for n in independent-verification source-integrity; do
+            gh api "repos/$REPO/check-runs" -f name=$n -f head_sha=$SHA -f status=completed -f conclusion=success \
+              -f "output[title]=FORGED by negative test N7" -f "output[summary]=Forged from a PR-defined workflow"
+          done
