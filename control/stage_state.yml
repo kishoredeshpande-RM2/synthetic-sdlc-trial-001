@@ -1,0 +1,36 @@
+# Authoritative stage state for MC-SDLC-TOOL-001-T01.
+# Changed only by a reviewed commit that cites a decision record in control/decisions/.
+trial: MC-SDLC-TOOL-001-T01
+updated: 2026-10-19
+current_phase: "Phase 1 - sandbox and test-fixture preparation"
+current_stage: S0
+next_gate: "Mission Control Phase 1 acceptance, then approval of answer-key custody before any scored requirements assurance"
+
+blockers:
+  - id: BLK-01
+    description: "Scored requirements assurance (S2) may not start until Mission Control approves independent answer-key custody."
+    status: OPEN
+  - id: BLK-02
+    description: "Verifier identity separation on GitHub (GitHub App) not authorized; Producer and Verifier would share the Product Owner's GitHub credentials."
+    status: OPEN
+  - id: BLK-03
+    description: "Bot-opened pull request approval by the Product Owner not yet tested or accepted as legitimate human authorization."
+    status: OPEN
+  - id: BLK-04
+    description: "Rulesets, required checks and deployment environments not yet configured; no gate is enforced by GitHub yet."
+    status: OPEN
+
+stages:
+  S1: {name: "Requirements intake", status: NOT_STARTED, human_decision: null}
+  S2: {name: "Requirements assurance", status: NOT_STARTED, human_decision: null}
+  S3: {name: "Requirements baseline", status: NOT_STARTED, human_decision: null}
+  S4: {name: "Architecture / design", status: NOT_STARTED, human_decision: null}
+  S5: {name: "Implementation", status: NOT_STARTED, human_decision: null}
+  S6: {name: "Independent verification", status: NOT_STARTED, human_decision: null}
+  S7: {name: "Integration / release", status: NOT_STARTED, human_decision: null}
+  S8: {name: "Deployment / recovery", status: NOT_STARTED, human_decision: null}
+
+fixtures:
+  requirements_source: requirements/source/ToolShare_Commons_SRS_v1.0.docx
+  requirements_source_sha256: 3a47ed2ea549f1a9bcca0386354bac2d52cd8c045e212baccb0b39d835f6159f
+  answer_key_commitment: control/KEY_COMMITMENT.md

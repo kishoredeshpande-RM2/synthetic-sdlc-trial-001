@@ -1,0 +1,32 @@
+name: Requirements finding (S2)
+description: One requirements-assurance finding needing a human disposition.
+title: "[Finding] TLL-???: "
+labels: ["stage:S2", "finding"]
+body:
+  - type: input
+    id: ids
+    attributes: {label: Requirement IDs or section}
+    validations: {required: true}
+  - type: textarea
+    id: quote
+    attributes: {label: Verbatim quote from the converted requirements}
+    validations: {required: true}
+  - type: dropdown
+    id: class
+    attributes:
+      label: Class
+      options: [ambiguity, contradiction, omission, untestable, dependency, incomplete business rule, other]
+    validations: {required: true}
+  - type: dropdown
+    id: severity
+    attributes: {label: Severity, options: [critical, major, minor]}
+    validations: {required: true}
+  - type: textarea
+    id: question
+    attributes: {label: Stakeholder question / proposed clarification}
+  - type: dropdown
+    id: disposition
+    attributes:
+      label: Disposition (set by the Product Owner)
+      options: [PENDING, PASS, CLARIFICATION REQUIRED, BLOCK]
+    validations: {required: true}

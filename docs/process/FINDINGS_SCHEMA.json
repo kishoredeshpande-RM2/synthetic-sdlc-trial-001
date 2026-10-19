@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Requirements-assurance findings (MC-SDLC-TOOL-001-T01, stage S2)",
+  "type": "object",
+  "required": ["assessor", "tool_version", "instructions_sha256", "source_sha256", "findings"],
+  "properties": {
+    "assessor": {"type": "string"},
+    "tool_version": {"type": "string"},
+    "instructions_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["finding_id", "requirement_ids", "quote", "class", "severity", "proposed_disposition", "rationale", "question"],
+        "properties": {
+          "finding_id": {"type": "string"},
+          "requirement_ids": {"type": "array", "items": {"type": "string", "pattern": "^TLL-[0-9]{3}$"}},
+          "section": {"type": "string"},
+          "quote": {"type": "string", "minLength": 1},
+          "class": {"enum": ["ambiguity", "contradiction", "omission", "untestable", "dependency", "incomplete business rule", "other"]},
+          "severity": {"enum": ["critical", "major", "minor"]},
+          "proposed_disposition": {"enum": ["PASS", "CLARIFICATION REQUIRED", "BLOCK"]},
+          "rationale": {"type": "string"},
+          "question": {"type": "string"}
+        }
+      }
+    }
+  }
+}

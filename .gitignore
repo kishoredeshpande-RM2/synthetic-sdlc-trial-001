@@ -1,0 +1,6 @@
+# Never commit sealed or local-only material
+*SEALED*
+answer_key*
+__pycache__/
+.venv/
+~$*

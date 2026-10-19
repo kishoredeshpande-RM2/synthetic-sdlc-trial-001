@@ -1,0 +1,27 @@
+name: Stage gate
+description: Record a stage's inputs, outputs, verification and the human decision.
+title: "[Gate] S?: "
+labels: ["gate"]
+body:
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Stage
+      options: [S1 Requirements intake, S2 Requirements assurance, S3 Requirements baseline, S4 Architecture/design, S5 Implementation, S6 Independent verification, S7 Integration/release, S8 Deployment/recovery]
+    validations: {required: true}
+  - type: textarea
+    id: inputs
+    attributes: {label: Inputs (paths and commit SHAs)}
+    validations: {required: true}
+  - type: textarea
+    id: outputs
+    attributes: {label: Outputs produced (paths and SHAs), description: Mark Producer self-checks as such.}
+  - type: textarea
+    id: verification
+    attributes: {label: Independent verification evidence (verifier, exact SHA, verdict)}
+  - type: dropdown
+    id: decision
+    attributes:
+      label: Human decision
+      options: [PENDING, ACCEPT, REJECT, CLARIFICATION REQUIRED, BLOCK]
+    validations: {required: true}
