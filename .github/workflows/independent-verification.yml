@@ -16,7 +16,7 @@ jobs:
     if: github.event.issue.pull_request && startsWith(github.event.comment.body, 'SDLC-VERIFIER-VERDICT v1')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.0
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - name: Verify signature and binding, then create the check run
